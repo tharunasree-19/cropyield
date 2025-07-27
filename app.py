@@ -124,11 +124,12 @@ def register():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
         
-        # Create new user
+        # Create new user using put_item
         user_id = str(uuid.uuid4())
         hashed_password = generate_password_hash(password)
         
         try:
+            # Put item into users table
             users_table.put_item(Item={
                 'user_id': user_id,
                 'email': email,
@@ -326,6 +327,7 @@ def add_farm():
         farm_id = str(uuid.uuid4())
         
         try:
+            # Put item into farms table
             farms_table.put_item(Item={
                 'farm_id': farm_id,
                 'user_id': session['user_id'],
@@ -378,7 +380,7 @@ def add_yield_data(farm_id):
             # Check for yield anomalies
             is_anomaly, deviation = analyze_yield_anomaly(current_yield, historical_avg)
             
-            # Add yield data
+            # Put item into yield data table
             yield_data_table.put_item(Item={
                 'yield_id': yield_id,
                 'farm_id': farm_id,
@@ -476,6 +478,7 @@ def add_weather_data():
         weather_id = str(uuid.uuid4())
         
         try:
+            # Put item into weather table
             weather_table.put_item(Item={
                 'weather_id': weather_id,
                 'location': location,
@@ -495,12 +498,10 @@ def add_weather_data():
             return render_template('add_weather.html') if request.form else jsonify({'error': str(e)}), 500
     
     return render_template('add_weather.html')
-# Add these routes to your Flask backend code
 
 # ---------------------------------------
 # Weather Viewing Routes
 # ---------------------------------------
-
 @app.route('/weather')
 @login_required
 def weather_list():
@@ -650,6 +651,144 @@ def api_farm_performance():
         return jsonify({'error': str(e)}), 500
 
 # ---------------------------------------
+# Additional put_item routes
+# ---------------------------------------
+@app.route('/api/user/create', methods=['POST'])
+def create_user_api():
+    """API endpoint to create a new user"""
+    data = request.get_json()
+    
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role', 'farmer')
+    
+    if not all([username, email, password]):
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    user_id = str(uuid.uuid4())
+    hashed_password = generate_password_hash(password)
+    
+    try:
+        # Put item into users table
+        users_table.put_item(Item={
+            'user_id': user_id,
+            'email': email,
+            'username': username,
+            'password': hashed_password,
+            'role': role,
+            'created_at': datetime.now().isoformat(),
+            'is_active': True
+        })
+        
+        return jsonify({'message': 'User created successfully', 'user_id': user_id}), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/farm/create', methods=['POST'])
+@login_required
+def create_farm_api():
+    """API endpoint to create a new farm"""
+    data = request.get_json()
+    
+    farm_name = data.get('farm_name')
+    location = data.get('location')
+    area_acres = data.get('area_acres')
+    crop_type = data.get('crop_type')
+    
+    if not all([farm_name, location, area_acres, crop_type]):
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    farm_id = str(uuid.uuid4())
+    
+    try:
+        # Put item into farms table
+        farms_table.put_item(Item={
+            'farm_id': farm_id,
+            'user_id': session['user_id'],
+            'farm_name': farm_name,
+            'location': location,
+            'area_acres': float(area_acres),
+            'crop_type': crop_type,
+            'created_at': datetime.now().isoformat(),
+            'avg_yield': 0,
+            'last_updated': datetime.now().isoformat()
+        })
+        
+        return jsonify({'message': 'Farm created successfully', 'farm_id': farm_id}), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/yield/create', methods=['POST'])
+@login_required
+def create_yield_api():
+    """API endpoint to create yield data"""
+    data = request.get_json()
+    
+    farm_id = data.get('farm_id')
+    harvest_date = data.get('harvest_date')
+    yield_amount = data.get('yield_amount')
+    
+    if not all([farm_id, harvest_date, yield_amount]):
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    yield_id = str(uuid.uuid4())
+    
+    try:
+        # Put item into yield data table
+        yield_data_table.put_item(Item={
+            'yield_id': yield_id,
+            'farm_id': farm_id,
+            'user_id': session['user_id'],
+            'harvest_date': harvest_date,
+            'yield_amount': float(yield_amount),
+            'quality_grade': data.get('quality_grade', 'A'),
+            'notes': data.get('notes', ''),
+            'created_at': datetime.now().isoformat()
+        })
+        
+        return jsonify({'message': 'Yield data created successfully', 'yield_id': yield_id}), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/weather/create', methods=['POST'])
+@login_required
+def create_weather_api():
+    """API endpoint to create weather data"""
+    data = request.get_json()
+    
+    location = data.get('location')
+    date = data.get('date')
+    temperature = data.get('temperature')
+    humidity = data.get('humidity')
+    
+    if not all([location, date, temperature, humidity]):
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    weather_id = str(uuid.uuid4())
+    
+    try:
+        # Put item into weather table
+        weather_table.put_item(Item={
+            'weather_id': weather_id,
+            'location': location,
+            'date': date,
+            'temperature': float(temperature),
+            'humidity': float(humidity),
+            'rainfall': float(data.get('rainfall', 0)),
+            'recorded_by': session['user_id'],
+            'created_at': datetime.now().isoformat()
+        })
+        
+        return jsonify({'message': 'Weather data created successfully', 'weather_id': weather_id}), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ---------------------------------------
 # Error Handlers
 # ---------------------------------------
 @app.errorhandler(404)
@@ -660,8 +799,5 @@ def not_found(error):
 def internal_error(error):
     return render_template('error.html', error='Internal server error'), 500
 
-# ---------------------------------------
-# Main
-# ---------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
