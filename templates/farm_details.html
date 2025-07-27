@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}{{ farm.farm_name }} - Farm Details{% endblock %}
+
+{% block content %}
+<!-- Farm Information -->
+<div class="content-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h1 style="color: #4CAF50; margin: 0;">{{ farm.farm_name }} 🚜</h1>
+        <a href="{{ url_for('add_yield_data', farm_id=farm.farm_id) }}" class="btn">+ Add Yield Data</a>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+        <div>
+            <h3 style="color: #333; margin-bottom: 1rem;">Farm Information</h3>
+            <p style="margin-bottom: 0.5rem;"><strong>📍 Location:</strong> {{ farm.location }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>🌾 Crop Type:</strong> {{ farm.crop_type }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>📏 Area:</strong> {{ farm.area_acres }} acres</p>
+            <p style="margin-bottom: 0.5rem;"><strong>🌱 Soil Type:</strong> {{ farm.soil_type or 'Not specified' }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>📅 Created:</strong> {{ farm.created_at[:10] }}</p>
+        </div>
+        
+        <div>
+            <h3 style="color: #333; margin-bottom: 1rem;">Performance Stats</h3>
+            <p style="margin-bottom: 0.5rem;"><strong>📊 Average Yield:</strong> {{ "%.2f"|format(farm.avg_yield) }} units</p>
+            <p style="margin-bottom: 0.5rem;"><strong>📈 Yield per Acre:</strong> {{ "%.2f"|format(farm.avg_yield / farm.area_acres) }} units/acre</p>
+            <p style="margin-bottom: 0.5rem;"><strong>🔄 Last Updated:</strong> {{ farm.last_updated[:10] if farm.last_updated else 'Never' }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>📋 Total Records:</strong> {{ yield_history|length }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Yield History -->
+<div class="content-box">
+    <h2 style="color: #4CAF50; margin-bottom: 1rem;">Yield History 📊</h2>
+    
+    {% if yield_history %}
+        <!-- Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            {% set total_yield = yield_history | sum(attribute='yield_amount') %}
+            {% set avg_yield = total_yield / yield_history|length %}
+            {% set anomaly_count = yield_history | selectattr('is_anomaly') | list | length %}
+            
+            <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 style="color: #4CAF50; margin-bottom: 0.5rem;">{{ "%.2f"|format(total_yield) }}</h3>
+                <p style="color: #666;">Total Yield</p>
+            </div>
+            
+            <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 style="color: #2196F3; margin-bottom: 0.5rem;">{{ "%.2f"|format(avg_yield) }}</h3>
+                <p style="color: #666;">Average Yield</p>
+            </div>
+            
+            <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 style="color: #FF9800; margin-bottom: 0.5rem;">{{ anomaly_count }}</h3>
+                <p style="color: #666;">Anomalies</p>
+            </div>
+        </div>
+        
+        <!-- Yield Records Table -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f5f5f5;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Harvest Date</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Yield Amount</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Quality Grade</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Deviation</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for yield_record in yield_history %}
+                        <tr style="{% if yield_record.is_anomaly %}background: #ffebee;{% endif %}">
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ yield_record.harvest_date }}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">{{ yield_record.yield_amount }} units</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                <span style="background: #4CAF50; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">
+                                    Grade {{ yield_record.quality_grade }}
+                                </span>
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% if yield_record.is_anomaly %}
+                                    <span style="color: #f44336; font-weight: bold;">⚠️ Anomaly</span>
+                                {% else %}
+                                    <span style="color: #4CAF50;">✅ Normal</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% if yield_record.deviation_percent %}
+                                    <span style="color: {% if yield_record.deviation_percent < 0 %}#f44336{% else %}#4CAF50{% endif %}">
+                                        {{ "%.1f"|format(yield_record.deviation_percent) }}%
+                                    </span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; max-width: 200px;">
+                                {{ yield_record.notes[:50] }}{% if yield_record.notes|length > 50 %}...{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem; background: #f9f9f9; border-radius: 8px;">
+            <h3 style="color: #666; margin-bottom: 1rem;">No yield data recorded yet</h3>
+            <p style="color: #999; margin-bottom: 2rem;">Start tracking your crop yields to see performance analytics.</p>
+            <a href="{{ url_for('add_yield_data', farm_id=farm.farm_id) }}" class="btn" style="font-size: 1.1rem; padding: 12px 24px;">Add First Yield Record</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Actions -->
+<div class="content-box">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">Quick Actions</h3>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('add_yield_data', farm_id=farm.farm_id) }}" class="btn">Add Yield Data</a>
+        <a href="{{ url_for('farms') }}" class="btn btn-secondary">Back to Farms</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Dashboard</a>
+    </div>
+</div>
+{% endblock %}

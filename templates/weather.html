@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Weather Data - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h1 style="color: #4CAF50; margin: 0;">Weather Data 🌤️</h1>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="{{ url_for('add_weather_data') }}" class="btn">+ Add Weather Data</a>
+            {% if session.user_role == 'admin' %}
+                <a href="{{ url_for('weather_analytics') }}" class="btn btn-secondary">📊 Analytics</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if weather_records %}
+    <!-- Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        {% set recent_records = weather_records[:7] %}
+        {% if recent_records %}
+            {% set avg_temp = (recent_records | sum(attribute='temperature')) / recent_records|length %}
+            {% set avg_humidity = (recent_records | sum(attribute='humidity')) / recent_records|length %}
+            {% set total_rainfall = recent_records | sum(attribute='rainfall') %}
+            
+            <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #FF9800, #F57C00);">
+                <h3 style="color: white; margin-bottom: 0.5rem;">{{ "%.1f"|format(avg_temp) }}°C</h3>
+                <p style="color: white;">Avg Temperature</p>
+            </div>
+            
+            <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #2196F3, #1976D2);">
+                <h3 style="color: white; margin-bottom: 0.5rem;">{{ "%.1f"|format(avg_humidity) }}%</h3>
+                <p style="color: white;">Avg Humidity</p>
+            </div>
+            
+            <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #009688, #00796B);">
+                <h3 style="color: white; margin-bottom: 0.5rem;">{{ "%.1f"|format(total_rainfall) }}mm</h3>
+                <p style="color: white;">Total Rainfall (7 days)</p>
+            </div>
+            
+            <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #4CAF50, #45a049);">
+                <h3 style="color: white; margin-bottom: 0.5rem;">{{ weather_records|length }}</h3>
+                <p style="color: white;">Total Records</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Weather Records Table -->
+    <div class="content-box">
+        <h2 style="color: #4CAF50; margin-bottom: 1rem;">Weather Records</h2>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f5f5f5;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Date</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Location</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Temperature</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Humidity</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Rainfall</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Recorded By</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Weather</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for weather in weather_records %}
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">
+                                {{ weather.date }}
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                📍 {{ weather.location }}
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                <span style="background: 
+                                    {% if weather.temperature|float < 10 %}#2196F3
+                                    {% elif weather.temperature|float > 35 %}#f44336
+                                    {% else %}#FF9800{% endif %}; 
+                                    color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">
+                                    🌡️ {{ weather.temperature }}°C
+                                </span>
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                <span style="background: 
+                                    {% if weather.humidity|float < 30 %}#FF9800
+                                    {% elif weather.humidity|float > 80 %}#2196F3
+                                    {% else %}#4CAF50{% endif %}; 
+                                    color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">
+                                    💧 {{ weather.humidity }}%
+                                </span>
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% if weather.rainfall|float > 0 %}
+                                    <span style="background: #009688; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">
+                                        🌧️ {{ weather.rainfall }}mm
+                                    </span>
+                                {% else %}
+                                    <span style="color: #999;">☀️ No rain</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-family: monospace; color: #666;">
+                                {{ weather.recorded_by[:8] }}...
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% set temp = weather.temperature|float %}
+                                {% set humidity = weather.humidity|float %}
+                                {% set rainfall = weather.rainfall|float %}
+                                
+                                {% if rainfall > 5 %}
+                                    🌧️ Rainy
+                                {% elif temp > 30 and humidity < 50 %}
+                                    ☀️ Hot & Dry
+                                {% elif temp > 25 and humidity > 70 %}
+                                    🌤️ Warm & Humid
+                                {% elif temp < 15 %}
+                                    ❄️ Cold
+                                {% else %}
+                                    🌤️ Pleasant
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Weather Tips -->
+    <div class="content-box" style="background: #f9f9f9;">
+        <h3 style="color: #4CAF50; margin-bottom: 1rem;">🌾 Weather Impact on Crops</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+            <div>
+                <h4 style="color: #333; margin-bottom: 0.5rem;">Temperature Effects</h4>
+                <p style="color: #666; font-size: 0.9rem;">Optimal crop temperatures vary by type. Extreme heat or cold can stress plants and reduce yields.</p>
+            </div>
+            
+            <div>
+                <h4 style="color: #333; margin-bottom: 0.5rem;">Humidity Levels</h4>
+                <p style="color: #666; font-size: 0.9rem;">High humidity can promote diseases, while low humidity may cause water stress in crops.</p>
+            </div>
+            
+            <div>
+                <h4 style="color: #333; margin-bottom: 0.5rem;">Rainfall Patterns</h4>
+                <p style="color: #666; font-size: 0.9rem;">Consistent rainfall is crucial for crop growth. Both drought and flooding can significantly impact yields.</p>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <div class="content-box" style="text-align: center; padding: 3rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🌤️</div>
+        <h3 style="color: #666; margin-bottom: 1rem;">No weather data recorded yet</h3>
+        <p style="color: #999; margin-bottom: 2rem;">Start recording weather conditions to track environmental impact on your crops.</p>
+        <a href="{{ url_for('add_weather_data') }}" class="btn" style="font-size: 1.1rem; padding: 12px 24px;">Add Weather Data</a>
+    </div>
+{% endif %}
+{% endblock %}

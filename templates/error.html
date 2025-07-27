@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box" style="text-align: center; max-width: 600px; margin: 0 auto;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+    
+    <h1 style="color: #f44336; margin-bottom: 1rem;">Oops! Something went wrong</h1>
+    
+    <div style="background: #ffebee; border: 1px solid #ffcdd2; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: #d32f2f; margin-bottom: 0.5rem;">Error Details:</h3>
+        <p style="color: #666; font-family: monospace; background: white; padding: 1rem; border-radius: 4px;">
+            {{ error }}
+        </p>
+    </div>
+    
+    <div style="margin-bottom: 2rem;">
+        <p style="color: #666; margin-bottom: 1rem;">Don't worry! Here are some things you can try:</p>
+        
+        <div style="text-align: left; max-width: 400px; margin: 0 auto;">
+            <ul style="color: #666; line-height: 1.8;">
+                <li>Check your internet connection</li>
+                <li>Refresh the page and try again</li>
+                <li>Go back to the previous page</li>
+                <li>Return to the dashboard</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <button onclick="history.back()" class="btn btn-secondary">← Go Back</button>
+        <button onclick="window.location.reload()" class="btn">🔄 Refresh Page</button>
+        <a href="{{ url_for('dashboard') }}" class="btn">🏠 Dashboard</a>
+    </div>
+</div>
+
+<!-- Help Section -->
+<div class="content-box" style="max-width: 600px; margin: 2rem auto 0; background: #f9f9f9;">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">Need Help? 🤔</h3>
+    <p style="color: #666; margin-bottom: 1rem;">
+        If you continue experiencing issues, here are some common solutions:
+    </p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Browser Issues</h4>
+            <p style="color: #666; font-size: 0.9rem;">Clear your browser cache and cookies, or try a different browser.</p>
+        </div>
+        
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Connection Problems</h4>
+            <p style="color: #666; font-size: 0.9rem;">Check your internet connection and firewall settings.</p>
+        </div>
+        
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Data Issues</h4>
+            <p style="color: #666; font-size: 0.9rem;">Ensure all required fields are filled correctly.</p>
+        </div>
+        
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">System Maintenance</h4>
+            <p style="color: #666; font-size: 0.9rem;">We might be performing updates. Try again in a few minutes.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

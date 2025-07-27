@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Add Weather Data - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box" style="max-width: 600px; margin: 0 auto;">
+    <h1 style="color: #4CAF50; margin-bottom: 2rem; text-align: center;">Add Weather Data 🌤️</h1>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="location">Location: *</label>
+            <input type="text" id="location" name="location" required placeholder="City, State/Province" value="{{ session.farm_name or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="date">Date: *</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="temperature">Temperature (°C): *</label>
+            <input type="number" id="temperature" name="temperature" step="0.1" required placeholder="25.0">
+        </div>
+        
+        <div class="form-group">
+            <label for="humidity">Humidity (%): *</label>
+            <input type="number" id="humidity" name="humidity" min="0" max="100" required placeholder="65">
+        </div>
+        
+        <div class="form-group">
+            <label for="rainfall">Rainfall (mm):</label>
+            <input type="number" id="rainfall" name="rainfall" step="0.1" min="0" placeholder="0.0">
+            <small style="color: #666; font-size: 0.9rem;">Leave as 0 if no rainfall occurred</small>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+            <button type="submit" class="btn" style="padding: 12px 24px; font-size: 1.1rem;">Add Weather Data</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1.1rem;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Weather Info -->
+<div class="content-box" style="max-width: 600px; margin: 2rem auto 0;">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">🌡️ Weather Parameter Guidelines</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+            <h4 style="color: #4CAF50; margin-bottom: 0.5rem;">Temperature</h4>
+            <p style="color: #666; font-size: 0.9rem;">Record in Celsius. Average daily temperature or temperature at recording time.</p>
+        </div>
+        
+        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+            <h4 style="color: #2196F3; margin-bottom: 0.5rem;">Humidity</h4>
+            <p style="color: #666; font-size: 0.9rem;">Relative humidity percentage (0-100%). Important for disease prediction.</p>
+        </div>
+        
+        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px;">
+            <h4 style="color: #FF9800; margin-bottom: 0.5rem;">Rainfall</h4>
+            <p style="color: #666; font-size: 0.9rem;">Precipitation in millimeters. Critical for irrigation planning.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Tips -->
+<div class="content-box" style="max-width: 600px; margin: 2rem auto 0;">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">💡 Weather Recording Tips</h3>
+    <ul style="color: #666; line-height: 1.8;">
+        <li>Record weather data daily for the most accurate tracking</li>
+        <li>Try to record at the same time each day for consistency</li>
+        <li>Use a reliable weather station or verified weather service data</li>
+        <li>Weather data helps correlate environmental conditions with yield performance</li>
+        <li>Consider recording data for each farm location if they're geographically distant</li>
+    </ul>
+</div>
+
+<script>
+    // Set today's date as default
+    document.getElementById('date').valueAsDate = new Date();
+</script>
+{% endblock %}

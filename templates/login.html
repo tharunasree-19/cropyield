@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box" style="max-width: 400px; margin: 0 auto;">
+    <h2 style="text-align: center; color: #4CAF50; margin-bottom: 2rem;">Login to Your Account</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="form-group" style="text-align: center;">
+            <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 12px;">Login</button>
+        </div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #ddd;">
+        <p>Don't have an account? <a href="{{ url_for('register') }}" style="color: #4CAF50; text-decoration: none;">Register here</a></p>
+    </div>
+</div>
+{% endblock %}

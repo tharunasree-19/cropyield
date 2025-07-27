@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Dashboard - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <h1 style="color: #4CAF50; margin-bottom: 1rem;">Welcome, {{ session.username }}! 👨‍🌾</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Manage your farms and track your crop yields from this dashboard.</p>
+    
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <a href="{{ url_for('add_farm') }}" class="btn">+ Add New Farm</a>
+        <a href="{{ url_for('add_weather_data') }}" class="btn btn-secondary">+ Add Weather Data</a>
+    </div>
+</div>
+
+<!-- Farms Overview -->
+<div class="content-box">
+    <h2 style="color: #4CAF50; margin-bottom: 1rem;">Your Farms</h2>
+    
+    {% if farms %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+            {% for farm in farms %}
+                <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                    <h3 style="margin-bottom: 0.5rem; color: #333;">{{ farm.farm_name }}</h3>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>Location:</strong> {{ farm.location }}</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>Crop:</strong> {{ farm.crop_type }}</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>Area:</strong> {{ farm.area_acres }} acres</p>
+                    <p style="color: #666; margin-bottom: 1rem;"><strong>Avg Yield:</strong> {{ "%.2f"|format(farm.avg_yield) }} units</p>
+                    
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="{{ url_for('farm_details', farm_id=farm.farm_id) }}" class="btn" style="font-size: 0.9rem; padding: 8px 16px;">View Details</a>
+                        <a href="{{ url_for('add_yield_data', farm_id=farm.farm_id) }}" class="btn btn-secondary" style="font-size: 0.9rem; padding: 8px 16px;">Add Yield</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2rem; background: #f9f9f9; border-radius: 8px;">
+            <p style="color: #666; margin-bottom: 1rem;">You haven't added any farms yet.</p>
+            <a href="{{ url_for('add_farm') }}" class="btn">Add Your First Farm</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Recent Yield Data -->
+<div class="content-box">
+    <h2 style="color: #4CAF50; margin-bottom: 1rem;">Recent Yield Records</h2>
+    
+    {% if recent_yields %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f5f5f5;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Date</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Farm</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Yield</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Quality</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for yield in recent_yields %}
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ yield.harvest_date }}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ yield.farm_id[:8] }}...</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ yield.yield_amount }} units</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">Grade {{ yield.quality_grade }}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% if yield.is_anomaly %}
+                                    <span style="color: #f44336; font-weight: bold;">⚠️ Anomaly</span>
+                                {% else %}
+                                    <span style="color: #4CAF50;">✅ Normal</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2rem; background: #f9f9f9; border-radius: 8px;">
+            <p style="color: #666;">No yield data recorded yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

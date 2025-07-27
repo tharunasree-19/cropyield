@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Add Farm - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box" style="max-width: 600px; margin: 0 auto;">
+    <h1 style="color: #4CAF50; margin-bottom: 2rem; text-align: center;">Add New Farm 🚜</h1>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="farm_name">Farm Name: *</label>
+            <input type="text" id="farm_name" name="farm_name" required placeholder="Enter farm name">
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location: *</label>
+            <input type="text" id="location" name="location" required placeholder="City, State/Province, Country">
+        </div>
+        
+        <div class="form-group">
+            <label for="area_acres">Area (in acres): *</label>
+            <input type="number" id="area_acres" name="area_acres" step="0.01" min="0.01" required placeholder="0.00">
+        </div>
+        
+        <div class="form-group">
+            <label for="crop_type">Crop Type: *</label>
+            <select id="crop_type" name="crop_type" required>
+                <option value="">Select crop type</option>
+                <option value="wheat">Wheat</option>
+                <option value="rice">Rice</option>
+                <option value="corn">Corn</option>
+                <option value="soybeans">Soybeans</option>
+                <option value="barley">Barley</option>
+                <option value="oats">Oats</option>
+                <option value="cotton">Cotton</option>
+                <option value="sugarcane">Sugarcane</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="fruits">Fruits</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="soil_type">Soil Type (Optional):</label>
+            <select id="soil_type" name="soil_type">
+                <option value="">Select soil type</option>
+                <option value="clay">Clay</option>
+                <option value="sandy">Sandy</option>
+                <option value="loam">Loam</option>
+                <option value="silt">Silt</option>
+                <option value="peat">Peat</option>
+                <option value="chalk">Chalk</option>
+            </select>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+            <button type="submit" class="btn" style="padding: 12px 24px; font-size: 1.1rem;">Add Farm</button>
+            <a href="{{ url_for('farms') }}" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1.1rem;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="content-box" style="max-width: 600px; margin: 2rem auto 0;">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">💡 Tips for Adding Farms</h3>
+    <ul style="color: #666; line-height: 1.8;">
+        <li>Choose a descriptive name that helps you identify the farm easily</li>
+        <li>Include specific location details for better weather data correlation</li>
+        <li>Accurate area measurement helps in yield calculation per acre</li>
+        <li>Selecting the correct crop type enables better analytics and comparisons</li>
+        <li>Soil type information helps in understanding yield variations</li>
+    </ul>
+</div>
+{% endblock %}

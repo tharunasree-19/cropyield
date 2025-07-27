@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <h1 style="color: #4CAF50; margin-bottom: 1rem;">Admin Dashboard 👨‍💼</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Overview of all farms and yield data across the platform.</p>
+</div>
+
+<!-- Statistics Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #4CAF50, #45a049);">
+        <h2 style="color: white; margin-bottom: 0.5rem;">{{ total_farms }}</h2>
+        <p style="color: white; font-size: 1.1rem;">Total Farms</p>
+    </div>
+    
+    <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #2196F3, #1976D2);">
+        <h2 style="color: white; margin-bottom: 0.5rem;">{{ total_yield_records }}</h2>
+        <p style="color: white; font-size: 1.1rem;">Yield Records</p>
+    </div>
+    
+    <div class="content-box" style="text-align: center; background: linear-gradient(135deg, #FF9800, #F57C00);">
+        <h2 style="color: white; margin-bottom: 0.5rem;">{{ low_yield_farms|length }}</h2>
+        <p style="color: white; font-size: 1.1rem;">Low Yield Alerts</p>
+    </div>
+</div>
+
+<!-- Low Yield Farms Alert -->
+{% if low_yield_farms %}
+<div class="content-box" style="border-left: 4px solid #f44336;">
+    <h2 style="color: #f44336; margin-bottom: 1rem;">⚠️ Farms Requiring Attention</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+        {% for farm in low_yield_farms %}
+            <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; border: 1px solid #ffcc02;">
+                <h4 style="color: #e65100; margin-bottom: 0.5rem;">{{ farm.farm_name }}</h4>
+                <p style="color: #666; margin-bottom: 0.3rem;"><strong>Location:</strong> {{ farm.location }}</p>
+                <p style="color: #666; margin-bottom: 0.3rem;"><strong>Crop:</strong> {{ farm.crop_type }}</p>
+                <p style="color: #f44336; font-weight: bold;">Avg Yield: {{ "%.2f"|format(farm.avg_yield) }} units</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Yield Data -->
+<div class="content-box">
+    <h2 style="color: #4CAF50; margin-bottom: 1rem;">Recent Yield Data (All Farms)</h2>
+    
+    {% if recent_yields %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f5f5f5;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Date</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Farm ID</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">User ID</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Yield</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Quality</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Deviation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for yield in recent_yields %}
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ yield.harvest_date }}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-family: monospace;">{{ yield.farm_id[:8] }}...</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee; font-family: monospace;">{{ yield.user_id[:8] }}...</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ yield.yield_amount }} units</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">Grade {{ yield.quality_grade }}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% if yield.is_anomaly %}
+                                    <span style="color: #f44336; font-weight: bold;">⚠️ Anomaly</span>
+                                {% else %}
+                                    <span style="color: #4CAF50;">✅ Normal</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                {% if yield.deviation_percent %}
+                                    {{ "%.1f"|format(yield.deviation_percent) }}%
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2rem; background: #f9f9f9; border-radius: 8px;">
+            <p style="color: #666;">No yield data available.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<!-- Add this to the Quick Actions section in your admin_dashboard.html -->
+
+<!-- Quick Actions -->
+<div class="content-box">
+    <h2 style="color: #4CAF50; margin-bottom: 1rem;">Quick Actions</h2>
+    
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('farms') }}" class="btn">🚜 View All Farms</a>
+        <a href="{{ url_for('weather_list') }}" class="btn btn-secondary">🌤️ Weather Data</a>
+        <a href="{{ url_for('weather_analytics') }}" class="btn btn-secondary">📊 Weather Analytics</a>
+        <a href="{{ url_for('add_weather_data') }}" class="btn">+ Add Weather Data</a>
+        <button onclick="window.location.reload()" class="btn" style="background: #FF9800;">🔄 Refresh Data</button>
+    </div>
+</div>
+{% endblock %}

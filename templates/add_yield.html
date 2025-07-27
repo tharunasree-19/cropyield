@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Add Yield Data - {{ farm.farm_name }}{% endblock %}
+
+{% block content %}
+<div class="content-box" style="max-width: 600px; margin: 0 auto;">
+    <h1 style="color: #4CAF50; margin-bottom: 1rem; text-align: center;">Add Yield Data 📊</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 2rem;">Recording yield for: <strong>{{ farm.farm_name }}</strong></p>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="harvest_date">Harvest Date: *</label>
+            <input type="date" id="harvest_date" name="harvest_date" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="yield_amount">Yield Amount (units): *</label>
+            <input type="number" id="yield_amount" name="yield_amount" step="0.01" min="0" required placeholder="0.00">
+            <small style="color: #666; font-size: 0.9rem;">Enter the total yield harvested in your preferred units</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="quality_grade">Quality Grade:</label>
+            <select id="quality_grade" name="quality_grade">
+                <option value="A">Grade A - Premium Quality</option>
+                <option value="B">Grade B - Good Quality</option>
+                <option value="C">Grade C - Standard Quality</option>
+                <option value="D">Grade D - Below Standard</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Notes (Optional):</label>
+            <textarea id="notes" name="notes" placeholder="Any additional notes about this harvest (weather conditions, issues, etc.)"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+            <button type="submit" class="btn" style="padding: 12px 24px; font-size: 1.1rem;">Add Yield Data</button>
+            <a href="{{ url_for('farm_details', farm_id=farm.farm_id) }}" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1.1rem;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Farm Info Summary -->
+<div class="content-box" style="max-width: 600px; margin: 2rem auto 0; background: #f9f9f9;">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">Farm Summary</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div>
+            <p style="margin-bottom: 0.5rem;"><strong>📍 Location:</strong> {{ farm.location }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>🌾 Crop:</strong> {{ farm.crop_type }}</p>
+        </div>
+        <div>
+            <p style="margin-bottom: 0.5rem;"><strong>📏 Area:</strong> {{ farm.area_acres }} acres</p>
+            <p style="margin-bottom: 0.5rem;"><strong>📊 Avg Yield:</strong> {{ "%.2f"|format(farm.avg_yield) }} units</p>
+        </div>
+    </div>
+</div>
+
+<!-- Tips -->
+<div class="content-box" style="max-width: 600px; margin: 2rem auto 0;">
+    <h3 style="color: #4CAF50; margin-bottom: 1rem;">💡 Tips for Recording Yield Data</h3>
+    <ul style="color: #666; line-height: 1.8;">
+        <li>Record yield data as soon as possible after harvest for accuracy</li>
+        <li>Use consistent units across all your yield records</li>
+        <li>Include weather conditions or any issues in the notes section</li>
+        <li>Quality grades help track the commercial value of your harvest</li>
+        <li>The system will automatically detect yield anomalies and send alerts</li>
+    </ul>
+</div>
+{% endblock %}

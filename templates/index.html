@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box" style="text-align: center;">
+    <h1 style="color: #4CAF50; margin-bottom: 1rem; font-size: 2.5rem;">Welcome to Crop Yield Management</h1>
+    <p style="font-size: 1.2rem; margin-bottom: 2rem; color: #666;">
+        Manage your farms, track yields, and optimize crop production with our comprehensive platform.
+    </p>
+    
+    <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem;">
+        <div style="background: #f9f9f9; padding: 2rem; border-radius: 10px; max-width: 300px;">
+            <h3 style="color: #4CAF50; margin-bottom: 1rem;">🚜 Farm Management</h3>
+            <p>Track multiple farms, crop types, and manage your agricultural operations efficiently.</p>
+        </div>
+        
+        <div style="background: #f9f9f9; padding: 2rem; border-radius: 10px; max-width: 300px;">
+            <h3 style="color: #4CAF50; margin-bottom: 1rem;">📊 Yield Analytics</h3>
+            <p>Monitor crop yields, detect anomalies, and get insights for better decision making.</p>
+        </div>
+        
+        <div style="background: #f9f9f9; padding: 2rem; border-radius: 10px; max-width: 300px;">
+            <h3 style="color: #4CAF50; margin-bottom: 1rem;">🌤️ Weather Tracking</h3>
+            <p>Record and analyze weather data to understand its impact on your crops.</p>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('login') }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px;">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary" style="font-size: 1.1rem; padding: 15px 30px;">Register</a>
+    </div>
+</div>
+
+<div class="content-box">
+    <h2 style="color: #4CAF50; margin-bottom: 1rem;">Why Choose Our Platform?</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Real-time Monitoring</h4>
+            <p>Get instant alerts for yield anomalies and performance issues.</p>
+        </div>
+        
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Data-Driven Insights</h4>
+            <p>Make informed decisions based on comprehensive analytics and historical data.</p>
+        </div>
+        
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Easy to Use</h4>
+            <p>Simple interface designed for farmers and agricultural professionals.</p>
+        </div>
+        
+        <div>
+            <h4 style="color: #333; margin-bottom: 0.5rem;">Secure & Reliable</h4>
+            <p>Your data is safe with enterprise-grade security and cloud infrastructure.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

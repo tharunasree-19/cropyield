@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Farms - Crop Yield Management{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h1 style="color: #4CAF50; margin: 0;">Farms Management 🚜</h1>
+        <a href="{{ url_for('add_farm') }}" class="btn">+ Add New Farm</a>
+    </div>
+</div>
+
+{% if farms %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+        {% for farm in farms %}
+            <div class="content-box" style="border-left: 4px solid #4CAF50;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <h3 style="color: #333; margin: 0;">{{ farm.farm_name }}</h3>
+                    {% if session.user_role == 'admin' %}
+                        <span style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
+                            Owner: {{ farm.user_id[:8] }}...
+                        </span>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>📍 Location:</strong> {{ farm.location }}</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>🌾 Crop Type:</strong> {{ farm.crop_type }}</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>📏 Area:</strong> {{ farm.area_acres }} acres</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>🌱 Soil Type:</strong> {{ farm.soil_type or 'Not specified' }}</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>📊 Average Yield:</strong> {{ "%.2f"|format(farm.avg_yield) }} units</p>
+                    <p style="color: #666; margin-bottom: 0.5rem;"><strong>📅 Created:</strong> {{ farm.created_at[:10] }}</p>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="{{ url_for('farm_details', farm_id=farm.farm_id) }}" class="btn" style="font-size: 0.9rem; padding: 8px 16px;">View Details</a>
+                    <a href="{{ url_for('add_yield_data', farm_id=farm.farm_id) }}" class="btn btn-secondary" style="font-size: 0.9rem; padding: 8px 16px;">Add Yield</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="content-box" style="text-align: center; padding: 3rem;">
+        <h3 style="color: #666; margin-bottom: 1rem;">No farms found</h3>
+        <p style="color: #999; margin-bottom: 2rem;">Get started by adding your first farm to the system.</p>
+        <a href="{{ url_for('add_farm') }}" class="btn" style="font-size: 1.1rem; padding: 12px 24px;">Add Your First Farm</a>
+    </div>
+{% endif %}
+{% endblock %}
